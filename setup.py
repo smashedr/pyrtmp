@@ -5,8 +5,10 @@ setup(
     windows=[{'script': "pyrtmp.py"}],
     options={
         'py2exe': {
+            'includes': ['tkinter'],
+            'bundle_files': 2,
             'compressed': True
-        }
+        },
     },
     zipfile=None,
 )

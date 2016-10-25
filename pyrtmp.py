@@ -6,14 +6,6 @@ from tkinter.messagebox import showerror
 import subprocess as sp
 import os
 
-
-OPTIONS = [
-    ("Computers", "computers"),
-    ("Science", "science"),
-    ("Politics", "politics"),
-    ("Cookie", "cookie"),
-]
-
 HELP = """\
 1. Select a video.
 2. Enter the rtmp destination.
@@ -48,6 +40,9 @@ class Window(tk.Frame):
         self.browse = tk.Button(self, text="Browse", command=self.load_file)
         self.txtstream = tk.Label(self, text="Stream")
         self.e_stream = tk.Entry(self)
+        self.txtkbps = tk.Label(self, text="Kbps")
+        self.e_kbps = tk.Entry(self)
+        self.e_kbps.insert(tk.END, '3500')
         self.txtstatus = tk.Label(self, text="Status")
         self.output = tk.Label(self, text='')
         self.quit = tk.Button(self, text='Quit', command=root.quit)
@@ -60,20 +55,20 @@ class Window(tk.Frame):
         self.browse.grid(row=0, column=3)
         self.txtstream.grid(row=1)
         self.e_stream.grid(row=1, column=1)
-        self.txtstatus.grid(row=2)
-        self.output.grid(row=2, column=1)
-        self.quit.grid(row=3, column=1, sticky=tk.W, pady=4)
-        self.start.grid(row=3, column=1, pady=4)
-        self.end.grid(row=3, column=1, sticky=tk.E,  pady=4)
+        self.txtkbps.grid(row=2)
+        self.e_kbps.grid(row=2, column=1)
+        self.txtstatus.grid(row=3)
+        self.output.grid(row=3, column=1)
+        self.quit.grid(row=4, column=1, sticky=tk.W, pady=4)
+        self.start.grid(row=4, column=1, pady=4)
+        self.end.grid(row=4, column=1, sticky=tk.E,  pady=4)
 
         self.update_status('Idle.')
 
     def start_stream(self):
-        print("File: %s\nStream: %s" % (self.e_file.get(), self.e_stream.get()))
-        cmd = 'ffmpeg -re -i %s -vcodec libx264 -profile:v main -preset:v veryfast -r 30 -g 60 -keyint_min 60 -sc_threshold 0 -b:v 3500k -maxrate 3500k -bufsize 3500k -sws_flags lanczos+accurate_rnd -strict -2 -acodec aac -b:a 160k -ar 48000 -ac 2 -f flv %s' % (self.e_file.get(), self.e_stream.get())
+        cmd = 'ffmpeg -re -i %s -vcodec libx264 -profile:v main -preset:v veryfast -r 30 -g 60 -keyint_min 60 -sc_threshold 0 -b:v 3500k -maxrate %sk -bufsize 3500k -sws_flags lanczos+accurate_rnd -strict -2 -acodec aac -b:a 160k -ar 48000 -ac 2 -f flv %s' % (self.e_file.get(), self.e_kbps.get(), self.e_stream.get())
         cmd_list = cmd.split(' ')
         sp.Popen(cmd_list)
-        _url = self.e_stream.get()
         self.update_status('STREAMING...')
 
     def end_stream(self):
